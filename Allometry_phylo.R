@@ -14,9 +14,7 @@ library(nlme)
 library(ape)
 library(geiger) # for treedata() function
 library(caper)
-#library(coda) # only for autocorr function
 library(phytools)
-#library(tibble) # To add columns to datasets with control
 library(RColorBrewer)
 library(ggplot2)
 

@@ -16,8 +16,6 @@ Code by: A Shankar, github/nushiamme; contact: nushiamme\<at\>gmail\<dot\>com fo
     + ape
     + geiger
     + caper
-    + coda
     + phytools
-    + tibble
     + RColorBrewer
     + ggplot2
