@@ -28,7 +28,7 @@ tree_dlw<-read.tree("hum294.tre")
 
 ## General plotting functions
 ## Generic theme
-my_theme <- theme_classic(base_size = 30) + 
+my_theme <- theme_classic(base_size = 35) + 
   theme(panel.border = element_rect(colour = "black", fill=NA)) 
 
 ## To add linear regression equation to plot
@@ -43,11 +43,14 @@ lm_eqn <- function(y, x){
 }
 
 ## Aggregating dataset by Species and site, to get species means of mass and daily energy expenditure (DEE)
+fmr_data$Lit_data2 <- fmr_data$Lit_data
+levels(fmr_data$Lit_data2)[match("Data_2016",levels(fmr_data$Lit_data2))] <- "Data"
+levels(fmr_data$Lit_data2)
 dlw_mean <- data.frame()
-dlw_mean <- aggregate(fmr_data$kJ_day, by=list(fmr_data$Species, fmr_data$Big_site), FUN="mean", na.omit=T)
-dlw_mass <- aggregate(fmr_data$Mass_g, by=list(fmr_data$Species, fmr_data$Big_site), FUN="mean", na.omit=T)
-dlw_mean <- merge(dlw_mean, dlw_mass, by = c("Group.1", "Group.2"))
-names(dlw_mean) <- c("Species", "Region", "kJ_day", "Mass_g")
+dlw_mean <- aggregate(fmr_data$kJ_day, by=list(fmr_data$Species, fmr_data$Big_site, fmr_data$Lit_data2), FUN="mean", na.omit=T)
+dlw_mass <- aggregate(fmr_data$Mass_g, by=list(fmr_data$Species, fmr_data$Big_site, fmr_data$Lit_data2), FUN="mean", na.omit=T)
+dlw_mean <- merge(dlw_mean, dlw_mass, by = c("Group.1", "Group.2", "Group.3"))
+names(dlw_mean) <- c("Species", "Region", "Lit_data2", "kJ_day", "Mass_g")
 
 ## Trimming tree to DLW dataset
 ## Manually replacing because it's a manageable number
@@ -236,16 +239,20 @@ plot(DEE_log_mass_noTree_noPgigas)
 colourCount <- length(unique(dlw_mean$Species))
 getPalette <- colorRampPalette(brewer.pal(9, "Set1"))
 
-
 ## Good graph of species means and individual points, with regression line through them. 
 ggplot(NULL, aes(log(Mass_g), log(kJ_day))) + 
-  geom_point(data=dlw_mean, aes(col=Species), size=6, shape=19) + 
-  geom_smooth(data=fmr_data, method=lm, alpha=0.3) + 
-  geom_point(data=fmr_data, aes(col=Species), shape = 19, size=4, alpha=0.5) + 
+  geom_point(data=dlw_mean, aes(col=Species, shape=Lit_data2), size=6) + 
+  geom_smooth(data=fmr_data, method=lm, alpha=0.3, col='black') + 
+  geom_point(data=fmr_data, aes(col=Species, shape=Lit_data2), size=4, alpha=0.5) + 
+  #geom_smooth(data=fmr_data[fmr_data$Lit_data2=="Lit",], method=lm, alpha=0.1, col='red') + 
+  stat_smooth(data=fmr_data[fmr_data$Lit_data2=="Lit",], 
+              method='lm', col='red', alpha=0.3, size=0.5, se=TRUE) +
+  scale_shape_manual(values=c(19, 17), name="Lit/Data") +
   my_theme + xlab("Log(Mass (g))") +
   scale_colour_manual(values = getPalette(colourCount)) +
   ylab("Log(kJ per day)")  + 
-  theme(legend.key.height=unit(2,"line"))
+  theme(legend.key.height=unit(1.5,"line"), legend.text = element_text(size=25), 
+        legend.title =  element_text(size=30))
 
 ## Good graph of just individual points, with regression line through them. 
 ggplot(NULL, aes(log(Mass_g), log(kJ_day))) + 
