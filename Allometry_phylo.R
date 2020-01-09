@@ -1,7 +1,7 @@
 ## Hummingbird FMR allometry
 ## Paper authors: Anusha Shankar, Catherine H Graham, Donald R Powers
 ## Code by: Anusha Shankar, github/nushiamme; 
-# contact: anusha<dot>shankar<at>stonybrook<dot>edu
+# contact: nushiamme<at>gmail<dot>com
 ## MCMCglmm models, accounting for both the phylogenetic structure and 
 # the repeated-measures per species
 
@@ -22,7 +22,7 @@ library(ggplot2)
 setwd("C:\\Users\\nushi\\Dropbox\\DLW_paper\\Data")
 fmr_data <- read.csv("DLW_TableS1.csv") #Compiled data from this paper and literature. Each row is an individual
 
-## Read in McGuire et al. 2014 hummingbird phylogeny
+## Read in McGuire et al. 2014 hummingbird phylogeny; contact nushiamme<at>gmail<dot>com if you cannot get access.
 tree_dlw<-read.tree("hum294.tre")
 #tre_ou_edited <- read.tree("OU_hummer_tree_FMR_edit.txt")
 
@@ -147,7 +147,7 @@ plot(tre_ou, cex=1.5, edge.width = 3)
 
 #set up a prior for a phylogenetic mixed model
 #Setting priors to be very uninformative
-prior<-list(G=list(G1=list(V=0.02,nu=0.02)),R=list(V=0.02,nu=0.02)) 
+prior<-list(G=list(G1=list(V=1,nu=0.02)),R=list(V=1,nu=0.02)) 
 #run the hierarchical phyogenetic model, the name of the species 
 #(repeated across rows of observations) 
 
@@ -168,13 +168,6 @@ levels(fmr_data$Temptrop)[match("AZ",levels(fmr_data$Temptrop))] <- 0
 levels(fmr_data$Temptrop)[match("CH",levels(fmr_data$Temptrop))] <- 1
 levels(fmr_data$Temptrop)[match("CR",levels(fmr_data$Temptrop))] <- 1
 levels(fmr_data$Temptrop)[match("EC",levels(fmr_data$Temptrop))] <- 1
-
-## Non-log model, just out of interest. Do not use!
-DEE_full_raw <-MCMCglmm(kJ_day~Mass_g+Temptrop, 
-             random=~Species, ginverse = list(Species=inv.phylo$Ainv), 
-             prior=prior, data=fmr_data, verbose=FALSE, nitt = 5000000, thin = 1000)
-summary(DEE_full_raw)
-plot(DEE_full_raw) 
 
 ## Log-log full model
 DEE_log <-MCMCglmm(log(kJ_day)~log(Mass_g)+Temptrop, 
